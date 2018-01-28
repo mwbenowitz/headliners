@@ -8,7 +8,6 @@
 
 # Core utilities
 import requests
-from bs4 import BeautifulSoup
 import sqlite3
 from elasticsearch import Elasticsearch
 from selenium import webdriver, common
@@ -25,8 +24,16 @@ import re
 import math
 from PIL import Image
 import uuid
+import argparse
 
 def main():
+
+    # Get any command line arguments passed
+    # Currenly only supports screenshot agrument
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--screenshots', action='store_true', help='Pass argument to include screenshots of each site during the snapshot process')
+    args = parser.parse_args()
+
     mainConfig = json.load(open("config.json"))
     chromeOptions = webdriver.ChromeOptions()
     chromeOptions.add_argument("--headless")
@@ -40,7 +47,7 @@ def main():
         mainConn = sqlite3.connect('test.db')
         cur = mainConn.cursor()
         cur.execute('''CREATE TABLE snapshots
-                        (uuid text PRIMARY KEY, runTime text, image text, site text)''')
+                        (uuid text PRIMARY KEY, runTime text, image text, site text, )''')
         cur.execute('''CREATE TABLE articles
                         (snapshot text, headline text, url text, score real, FOREIGN KEY(snapshot) REFERENCES snapshots(uuid))''')
         mainConn.commit()
@@ -67,20 +74,20 @@ def main():
         except common.exceptions.NoSuchElementException:
             pass
 
-        # Take screenshots of the currently loaded page
         body = driver.find_element_by_xpath("//body")
         bodySize = body.size
         totalHeight = bodySize['height']
+        fullScreen = None
         currentTime = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 
-        driver.set_window_size(1280, totalHeight)
-        fullScreen = site['shortName']+'_'+currentTime+'.png'
-        screenRes = driver.save_screenshot('screens/'+fullScreen)
-        if not screenRes:
-            print "Failed to take/save screenshot!"
+        # Take screenshots of the currently loaded page (if arg passed)
 
-        currentPos = 0
-        screenCount = 1
+        if args.screenshots:
+            driver.set_window_size(1280, totalHeight)
+            fullScreen = site['shortName']+'_'+currentTime+'.png'
+            screenRes = driver.save_screenshot('screens/'+fullScreen)
+            if not screenRes:
+                print "Failed to take/save screenshot!"
         snapValues = (runUUID, currentTime, fullScreen, site['name'])
         mainConn.execute("INSERT INTO snapshots VALUES (?, ?, ?, ?)", snapValues)
 
@@ -146,6 +153,10 @@ def main():
 
         # Index the results in elasticsearch
         es = Elasticsearch()
+        snapDoc = {"uuid": runUUID, "dateTime": currentTime, "screenshot": fullScreen, "site": site["name"]}
+        snap = es.index(index="snapshots", doc_type="snapshot", body=snapDoc)
+        if snap is False:
+            print "Failed to Index snapshot"
         for article in cur.execute("SELECT * FROM articles WHERE snapshot=?", (runUUID,)):
             articleDoc = {'headline': article[1], 'url': article[2], 'score': article[3], 'snapshot': article[0], 'site':      site['shortName']}
             art = es.index(index="articles", doc_type="article", body=articleDoc)
