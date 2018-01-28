@@ -1,0 +1,70 @@
+{
+    "group": "Real News",
+    "sites":[
+        {
+            "name": "The New York Times",
+            "shortName": "nyt",
+            "homeURL": "https://www.nytimes.com",
+            "findArticlesBy": "xpath",
+            "articleElement": "article",
+            "headlineClass": "story-heading",
+            "modifiers": [
+                {
+                    "class": "lede",
+                    "weight": 4
+                },{
+                    "class": "theme-feature",
+                    "weight": 3
+                },{
+                    "class": "theme-summary",
+                    "weight": 2
+                }
+            ],
+            "popUpCloseID": "closeCross"
+        },{
+            "name": "National Public Radio",
+            "shortName": "npr",
+            "homeURL": "https://www.npr.org",
+            "findArticlesBy": "xpath",
+            "articleElement": "article",
+            "headlineClass": "title",
+            "modifiers": [
+                {
+                    "class": "item-nib",
+                    "weight": 0.5
+                },{
+                    "class": "volume-high",
+                    "weight": 2
+                }
+            ],
+            "popUpCloseID": "closeCross"
+        },{
+            "name": "CNN",
+            "shortName": "cnn",
+            "homeURL": "https://www.cnn.com",
+            "findArticlesBy": "xpath",
+            "articleElement": "article",
+            "headlineClass": "cd__headline",
+            "modifiers": [],
+            "popUpCloseID": "closeCross"
+        },{
+            "name": "Fox News",
+            "shortName": "fox",
+            "homeURL": "http://www.foxnews.com",
+            "findArticlesBy": "xpath",
+            "articleElement": "article",
+            "headlineClass": "title",
+            "modifiers": [],
+            "popUpCloseID": "closeCross"
+        },{
+            "name": "The Washington Post",
+            "shortName": "wapo",
+            "homeURL": "https://www.washingtonpost.com",
+            "findArticlesBy": "class",
+            "articleElement": "pb-f-homepage-story",
+            "headlineClass": "headline",
+            "modifiers": [],
+            "popUpCloseID": "closeCross"
+        }
+    ]
+}
