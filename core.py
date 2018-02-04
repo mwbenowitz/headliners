@@ -34,10 +34,10 @@ def main():
     parser.add_argument('--screenshots', action='store_true', help='Pass argument to include screenshots of each site during the snapshot process')
     args = parser.parse_args()
 
-    mainConfig = json.load(open("config.json"))
+    mainConfig = json.load(open("./config.json"))
     chromeOptions = webdriver.ChromeOptions()
     chromeOptions.add_argument("--headless")
-    driver = webdriver.Chrome(chrome_options=chromeOptions)
+    driver = webdriver.Chrome('/usr/local/bin/chromedriver', chrome_options=chromeOptions)
 
     # for the initial loop we just store raw data, then we calculate scores
     # based on the entire run id
