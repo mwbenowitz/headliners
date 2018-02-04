@@ -1,8 +1,6 @@
 requests
 elasticsearch
-sqlite3
 selenium
-json
 numpy
 uuid
-PIL
+Pillow

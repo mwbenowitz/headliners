@@ -34,10 +34,10 @@ def main():
     parser.add_argument('--screenshots', action='store_true', help='Pass argument to include screenshots of each site during the snapshot process')
     args = parser.parse_args()
 
-    mainConfig = json.load(open("config.json"))
+    mainConfig = json.load(open("./config.json"))
     chromeOptions = webdriver.ChromeOptions()
     chromeOptions.add_argument("--headless")
-    driver = webdriver.Chrome(chrome_options=chromeOptions)
+    driver = webdriver.Chrome('/usr/local/bin/chromedriver', chrome_options=chromeOptions)
 
     # for the initial loop we just store raw data, then we calculate scores
     # based on the entire run id
@@ -47,7 +47,7 @@ def main():
         mainConn = sqlite3.connect('test.db')
         cur = mainConn.cursor()
         cur.execute('''CREATE TABLE snapshots
-                        (uuid text PRIMARY KEY, runTime text, image text, site text, )''')
+                        (uuid text PRIMARY KEY, runTime text, image text, site text)''')
         cur.execute('''CREATE TABLE articles
                         (snapshot text, headline text, url text, score real, FOREIGN KEY(snapshot) REFERENCES snapshots(uuid))''')
         mainConn.commit()
