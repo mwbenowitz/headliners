@@ -47,9 +47,11 @@ def main():
         mainConn = sqlite3.connect('test.db')
         cur = mainConn.cursor()
         cur.execute('''CREATE TABLE snapshots
-                        (uuid text PRIMARY KEY, runTime text, image text, site text, )''')
+                        (uuid text PRIMARY KEY, runTime text, image text, site text, siteCode text)''')
         cur.execute('''CREATE TABLE articles
-                        (snapshot text, headline text, url text, score real, FOREIGN KEY(snapshot) REFERENCES snapshots(uuid))''')
+                        (id integer PRIMARY KEY, headline text, url text)''')
+        cur.execute('''CREATE TABLE snap_articles
+                        (relID integer PRIMARY KEY, snap text, article integer, score real, FOREIGN KEY(snap) REFERENCES snapshots(uuid), FOREIGN KEY(article) REFERENCES articles(id))''')
         mainConn.commit()
 
     else:
@@ -78,7 +80,7 @@ def main():
         bodySize = body.size
         totalHeight = bodySize['height']
         fullScreen = None
-        currentTime = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+        currentTime = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
         # Take screenshots of the currently loaded page (if arg passed)
 
@@ -88,8 +90,8 @@ def main():
             screenRes = driver.save_screenshot('screens/'+fullScreen)
             if not screenRes:
                 print "Failed to take/save screenshot!"
-        snapValues = (runUUID, currentTime, fullScreen, site['name'])
-        mainConn.execute("INSERT INTO snapshots VALUES (?, ?, ?, ?)", snapValues)
+        snapValues = (runUUID, currentTime, fullScreen, site['name'], site['shortName'])
+        cur.execute("INSERT INTO snapshots VALUES (?, ?, ?, ?, ?)", snapValues)
 
         # Get the articles from the page
         if site['findArticlesBy'] == 'xpath':
@@ -100,6 +102,7 @@ def main():
         modifiers = site['modifiers']
         for modifier in modifiers:
             multiplyBy[modifier['class']] = modifier['weight']
+        newArticles = []
         for article in articles:
             score = 1
 
@@ -144,24 +147,40 @@ def main():
 
             print headline
             print score
-            articleValues = (runUUID, headline, headLink, score)
-            mainConn.execute("INSERT INTO articles VALUES (?, ?, ?, ?)", articleValues)
+            articleValues = (None, headline, headLink)
+            cur.execute('''SELECT * FROM articles
+                            INNER JOIN snap_articles ON articles.id = snap_articles.article
+                            INNER JOIN snapshots ON snap_articles.snap = snapshots.uuid
+                            WHERE headline=? AND snapshots.siteCode=?''', (headline, site['shortName']))
+            saved = cur.fetchone()
+            if saved is None:
+                cur.execute("INSERT INTO articles VALUES (?, ?, ?)", articleValues)
+                articleID = cur.lastrowid
+                newArticles.append(articleID)
+            else:
+                print article
+                articleID = saved[0]
+            cur.execute("INSERT INTO snap_articles VALUES (?, ?, ?, ?)", (None, runUUID, articleID, score))
 
+        mainConn.commit()
         # TODO maybe?
         # Calculate standard dev of location and size
         # Use those to calculate the score
 
         # Index the results in elasticsearch
         es = Elasticsearch()
-        snapDoc = {"uuid": runUUID, "dateTime": currentTime, "screenshot": fullScreen, "site": site["name"]}
+        snapDoc = {"uuid": runUUID, "dateTime": currentTime, "screenshot": fullScreen, "siteCode": site["shortName"], "site": site["name"]}
         snap = es.index(index="snapshots", doc_type="snapshot", body=snapDoc)
         if snap is False:
             print "Failed to Index snapshot"
-        for article in cur.execute("SELECT * FROM articles WHERE snapshot=?", (runUUID,)):
-            articleDoc = {'headline': article[1], 'url': article[2], 'score': article[3], 'snapshot': article[0], 'site':      site['shortName']}
+        for articleID in newArticles:
+            new = cur.execute("SELECT * FROM articles WHERE id=?", (articleID,))
+            newArticle = new.fetchone()
+            articleDoc = {'headline': newArticle[1], 'url': newArticle[2], 'sqlID': articleID}
             art = es.index(index="articles", doc_type="article", body=articleDoc)
 
     mainConn.commit()
+    mainConn.close()
     driver.close()
 
 
