@@ -6,3 +6,4 @@ json
 numpy
 uuid
 PIL
+flask

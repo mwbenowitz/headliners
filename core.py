@@ -158,7 +158,6 @@ def main():
                 articleID = cur.lastrowid
                 newArticles.append(articleID)
             else:
-                print article
                 articleID = saved[0]
             cur.execute("INSERT INTO snap_articles VALUES (?, ?, ?, ?)", (None, runUUID, articleID, score))
 
