@@ -1,8 +1,7 @@
-requests
-elasticsearch
-selenium
-numpy
-uuid
-PIL
-flask
-Pillow
+requests==2.6.0
+elasticsearch==5.4.0
+selenium==3.8.0
+numpy==1.14.0
+Flask==0.12
+Flask-Cors==3.0.2
+Pillow==5.0.0
