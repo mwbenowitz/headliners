@@ -1,10 +1,13 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import sqlite3
+import configparser
 import json
 from elasticsearch import Elasticsearch
 from datetime import datetime
 
+config = configparser.ConfigParser()
+config.read('../headliner.conf')
 app = Flask(__name__)
 cors = CORS(app)
 
@@ -18,11 +21,11 @@ def main():
 
 @app.route("/articles")
 def articles():
-    conn = sqlite3.connect('/var/www/headliner-api/test.db')
+    conn = sqlite3.connect(config['DB']['file'])
     cur = conn.cursor()
     headline = request.args.get('headline')
-    es = Elasticsearch()
-    articles = es.search(index='articles', body={'query':{'match': {'headline': headline}}, 'size': 500})
+    es = Elasticsearch([{'host': config['ES']['host'], 'port': int(config['ES']['port'])}])
+    articles = es.search(index=config['ES']['article_index'], body={'query':{'match': {'headline': headline}}, 'size': 500})
     if articles['hits']['total'] == 0:
         nonResponse = jsonify({'message': 'No results found for your search'})
         return nonResponse
@@ -56,4 +59,4 @@ def articles():
     return jsonify(response)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    app.run()

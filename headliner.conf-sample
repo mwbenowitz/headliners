@@ -1,0 +1,7 @@
+[DB]
+file = ../test.db
+
+[ES]
+host = localhost
+port = 9200
+article_index = articles
