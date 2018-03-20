@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/python
 #
 # This is the core Headline Scraper Tool
 # that looks at new site homepages
@@ -64,6 +64,7 @@ def main():
     chromeOptions = webdriver.ChromeOptions()
     chromeOptions.add_argument("--headless")
     chromeOptions.add_argument("window-size=1920,1080")
+    chromeOptions.add_argument("--no-sandbox")
     driver = webdriver.Chrome('/usr/local/bin/chromedriver', chrome_options=chromeOptions)
 
     # for the initial loop we just store raw data, then we calculate scores
@@ -96,6 +97,7 @@ def main():
             if loadRes or attempts > 2:
                 break
             driver = resetConnection(driver, chromeOptions)
+	    time.sleep(1)
             attempts += 1
 
         if not loadRes:
@@ -117,7 +119,6 @@ def main():
                 break
 
             newHeight = driver.execute_script("return document.body.scrollHeight")
-            print newHeight, lastHeight
             if newHeight == lastHeight:
                 break
             lastHeight = newHeight
@@ -211,7 +212,6 @@ def main():
                         break
                 if foundHeader == False:
                     print "Skipping Article from " + site['name'] + " (not visible)"
-                    print article.get_attribute('innerHTML')
                     continue
 
             if not headEl:
@@ -233,9 +233,6 @@ def main():
                     break
             size = article.size
             loc = article.location
-
-            print headline
-            print headLink
 
             # Calculate special class modifier
             classes = article.get_attribute("class")
@@ -262,8 +259,6 @@ def main():
                 score *= invLoc
             except ZeroDivisionError:
                 print "Could not find a location for this article"
-                print headline
-                print loc
                 continue
 
             articleValues = (None, headline, headLink)
@@ -300,6 +295,8 @@ def main():
 
     mainConn.commit()
     mainConn.close()
+    time.sleep(5)
+    driver.close()
     driver.quit()
 
 

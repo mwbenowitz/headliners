@@ -18,7 +18,7 @@ def main():
 
 @app.route("/articles")
 def articles():
-    conn = sqlite3.connect('../test.db')
+    conn = sqlite3.connect('/var/www/headliner-api/test.db')
     cur = conn.cursor()
     headline = request.args.get('headline')
     es = Elasticsearch()
@@ -32,11 +32,9 @@ def articles():
         articleID = article['_source']['sqlID']
         title = article['_source']['headline']
         url = article['_source']['url']
-        print title
         avgScore = 0
         instCount = 0
         for instance in cur.execute("SELECT relID, snap, score FROM snap_articles INNER JOIN articles ON articles.id = snap_articles.article WHERE articles.id=?", (articleID,)):
-            print instance[0]
             score = instance[2]
             snapUUID = instance[1]
             snapCur = conn.cursor()
@@ -58,4 +56,4 @@ def articles():
     return jsonify(response)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host='0.0.0.0')
