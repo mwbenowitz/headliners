@@ -192,7 +192,7 @@ def main():
                         break
                 except common.exceptions.NoSuchElementException:
                     continue
-                if not headline or headline == ' ':
+                if not headline or headline == ' ' or headline == '':
                     continue
                 foundHeader = True
                 break
