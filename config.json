@@ -79,7 +79,7 @@
             "shortName": "chron",
             "homeURL": "https://www.houstonchronicle.com",
             "findArticlesBy": "class",
-            "articleElements": ["item", "prem-hl-item", "prem-block", "sec-hl-item", "ftc-item-wrap"],
+            "articleElements": ["item", "prem-hl-item", "prem-block", "sec-hl-item", "ftc-item-wrap", "column", "hc-totn-item"],
             "headlineClasses": ["headline"],
             "modifiers": [],
             "popUpCloseID": "closeCross"

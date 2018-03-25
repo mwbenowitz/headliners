@@ -184,8 +184,10 @@ def main():
                     possibleHeads = article.find_elements_by_class_name(headlineClass)
                     for checkHead in possibleHeads:
                         headline = checkHead.text
-                        if not headline or headline == ' ':
-                            continue
+                        if not headline or headline == ' ' or headline == '':
+                            headline = checkHead.get_attribute('innerHTML')
+                            if not headline or headline == ' ':
+                                continue
                         headEl = checkHead
                         break
                 except common.exceptions.NoSuchElementException:
@@ -211,10 +213,11 @@ def main():
                         foundHeader = True
                         break
                 if foundHeader == False:
-                    print "Skipping Article from " + site['name'] + " (not visible)"
                     continue
 
             if not headEl:
+                print "======FAILED======"
+                print article.get_attribute('innerHTML')
                 continue
 
             headline = re.sub(r'<.*>', '', headline)
@@ -225,14 +228,23 @@ def main():
                 possibleLink = link.get_attribute("href")
                 if possibleLink:
                     headLink = possibleLink
+                    foundLink = True
                     break
             if foundLink == False:
                 moreLinks = article.find_elements_by_xpath(".//a[@href]")
-                for link in moreLinks:
-                    headLink = link.get_attribute("href")
-                    break
+                if moreLinks:
+                    for link in moreLinks:
+                        headLink = link.get_attribute("href")
+                        if headLink:
+                            foundLink = True
+                            break
+                if foundLink == False:
+                    headLink = article.get_attribute("href")
             size = article.size
             loc = article.location
+
+            print headline
+            print headLink
 
             # Calculate special class modifier
             classes = article.get_attribute("class")
