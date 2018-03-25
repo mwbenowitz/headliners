@@ -1,9 +1,11 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, escape
 from flask_cors import CORS
 import sqlite3
 import configparser
 import json
+import re
 from elasticsearch import Elasticsearch
+from elasticsearch_dsl import Search, Q
 from datetime import datetime
 
 config = configparser.ConfigParser()
@@ -23,9 +25,15 @@ def main():
 def articles():
     conn = sqlite3.connect(config['DB']['file'])
     cur = conn.cursor()
+
     headline = request.args.get('headline')
-    es = Elasticsearch([{'host': config['ES']['host'], 'port': int(config['ES']['port'])}])
-    articles = es.search(index=config['ES']['article_index'], body={'query':{'match': {'headline': headline}}, 'size': 500})
+
+    client = Elasticsearch([{'host': config['ES']['host'], 'port': int(config['ES']['port'])}])
+
+    es = Search(using=client, index='articles').query(Q('query_string', query=headline))
+    es = es[0:1000]
+    articles = es.execute()
+
     if articles['hits']['total'] == 0:
         nonResponse = jsonify({'message': 'No results found for your search'})
         return nonResponse

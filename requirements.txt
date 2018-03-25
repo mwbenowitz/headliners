@@ -6,3 +6,4 @@ Flask==0.12
 Flask-Cors==3.0.2
 Pillow==5.0.0
 configparser==3.5.0
+elasticsearch-dsl==5.3.0
