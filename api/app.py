@@ -4,14 +4,16 @@ import sqlite3
 import configparser
 import json
 import re
+import os
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from datetime import datetime
 
 config = configparser.ConfigParser()
-config.read('../headliner.conf')
 app = Flask(__name__)
 cors = CORS(app)
+print os.path.join(app.root_path, os.pardir, 'headliner.conf')
+config.read(os.path.join(app.root_path, os.pardir, 'headliner.conf'))
 
 @app.route("/")
 def main():
