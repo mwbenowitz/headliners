@@ -217,7 +217,6 @@ def main():
 
             if not headEl:
                 print "======FAILED======"
-                print article.get_attribute('innerHTML')
                 continue
 
             headline = re.sub(r'<.*>', '', headline)
@@ -243,8 +242,6 @@ def main():
             size = article.size
             loc = article.location
 
-            print headline
-            print headLink
 
             # Calculate special class modifier
             classes = article.get_attribute("class")

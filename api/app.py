@@ -12,8 +12,7 @@ from datetime import datetime
 config = configparser.ConfigParser()
 app = Flask(__name__)
 cors = CORS(app)
-print os.path.join(app.root_path, os.pardir, 'headliner.conf')
-config.read(os.path.join(app.root_path, os.pardir, 'headliner.conf'))
+config.read(os.path.join(app.root_path, '../headliner.conf'))
 
 @app.route("/")
 def main():
