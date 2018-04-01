@@ -101,12 +101,19 @@ class seleniumManager:
 
         return False, False
 
-    def getLink(self, article, headline):
+    def getLink(self, article, headline, linkClasses):
         headLinks = article.find_elements_by_link_text(headline)
         for link in headLinks:
             possibleLink = link.get_attribute("href")
             if possibleLink:
                 return possibleLink
+
+        for l_class in linkClasses:
+            possibleLinks = article.find_elements_by_class_name(l_class)
+            for possLink in possibleLinks:
+                l_href = possLink.get_attribute("href")
+                if l_href:
+                    return l_href
 
         moreLinks = article.find_elements_by_xpath(".//a[@href]")
         if moreLinks:
@@ -120,7 +127,8 @@ class seleniumManager:
         if headLink:
             return headLink
 
-        return False
+        headLink = headline.replace(' ', '_').lower()
+        return headLink
 
     def exit(self):
         time.sleep(5)

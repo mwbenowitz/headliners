@@ -8,6 +8,7 @@
             "findArticlesBy": "xpath",
             "articleElements": ["article"],
             "headlineClasses": ["story-heading", "refer-heading"],
+            "linkClasses": ["story-link"],
             "modifiers": [],
             "popUpCloseID": "closeCross",
             "loadedElement": "site-index"
@@ -18,6 +19,7 @@
             "findArticlesBy": "xpath",
             "articleElements": ["article"],
             "headlineClasses": ["title"],
+            "linkClasses": [],
             "modifiers": [],
             "popUpCloseID": "closeCross"
         },{
@@ -27,6 +29,7 @@
             "findArticlesBy": "xpath",
             "articleElements": ["article"],
             "headlineClasses": ["cd__headline"],
+            "linkClasses": [],
             "modifiers": [],
             "popUpCloseID": "closeCross"
         },{
@@ -36,6 +39,7 @@
             "findArticlesBy": "xpath",
             "articleElements": ["article"],
             "headlineClasses": ["title"],
+            "linkClasses": [],
             "modifiers": [],
             "popUpCloseID": "closeCross"
         },{
@@ -45,6 +49,7 @@
             "findArticlesBy": "class",
             "articleElements": ["pb-f-homepage-story", "powa-playlist-item"],
             "headlineClasses": ["headline"],
+            "linkClasses": [],
             "modifiers": [],
             "popUpCloseID": "closeCross"
         },{
@@ -54,6 +59,7 @@
             "findArticlesBy": "class",
             "articleElements": ["trb_outfit_primaryItem_article", "trb_outfit_group_list_item", "trb_outfit_list_headline", "trb_brk_g_i"],
             "headlineClasses": ["trb_outfit_primaryItem_article_title", "trb_outfit_relatedListTitle", "trb_outfit_list_headline_a", "trb_brk_g_i_t"],
+            "linkClasses": [],
             "modifiers": [],
             "popUpCloseID": "closeCross"
         },{
@@ -63,6 +69,7 @@
             "findArticlesBy": "class",
             "articleElements": ["pb-f-homepage-story", "pb-f-global-generic-card", "pb-f-list-recommender", "collection-item", "collection-item-border-bottom"],
             "headlineClasses": ["heavy-text", "card-title"],
+            "linkClasses": [],
             "modifiers": [],
             "popUpCloseID": "closeCross"
         },{
@@ -72,6 +79,7 @@
             "findArticlesBy": "class",
             "articleElements": ["hfwmm-primary-wrap", "hgpfm-link", "js-asset-link", "hgsm-link"],
             "headlineClasses": ["js-asset-headline", "hgsm-image-hed"],
+            "linkClasses": [],
             "modifiers": [],
             "popUpCloseID": "closeCross"
         },{
@@ -81,6 +89,7 @@
             "findArticlesBy": "class",
             "articleElements": ["item", "prem-hl-item", "prem-block", "sec-hl-item", "ftc-item-wrap", "column", "hc-totn-item"],
             "headlineClasses": ["headline"],
+            "linkClasses": [],
             "modifiers": [],
             "popUpCloseID": "closeCross"
         },{
@@ -90,6 +99,7 @@
             "findArticlesBy": "class",
             "articleElements": ["wsj-card"],
             "headlineClasses": ["wsj-headline-link"],
+            "linkClasses": [],
             "modifiers": [],
             "popUpCloseID": "closeCross"
         }
