@@ -1,7 +1,10 @@
 [DB]
-file = ../test.db
+auth_secret = AUTH_SECRET
+db_url = BOLT_URL
+db_usr = USR
+db_psw = PSW
 
 [ES]
 host = localhost
 port = 9200
-article_index = articles
+index = NEO4J_INDEX
