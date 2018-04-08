@@ -64,13 +64,21 @@ class seleniumManager:
         except common.exceptions.NoSuchElementException:
             pass
 
-    def getArticles(self, articleElements, find_type):
+    def getArticles(self, articleElements, find_type, skipClasses):
         articles = []
         for articleEl in articleElements:
             if find_type == 'xpath':
                 fArticles = self.driver.find_elements_by_xpath("//"+articleEl)
             elif find_type == 'class':
                 fArticles = self.driver.find_elements_by_class_name(articleEl)
+            if len(skipClasses) > 0:
+                for art in fArticles:
+                    artClasses = art.get_attribute('class')
+                    print artClasses
+                    for skipClass in skipClasses:
+                        print skipClass
+                        if skipClass in artClasses:
+                            fArticles.remove(art)
             articles = articles + fArticles
         return articles
 
@@ -127,8 +135,7 @@ class seleniumManager:
         if headLink:
             return headLink
 
-        headLink = headline.replace(' ', '_').lower()
-        return headLink
+        return False
 
     def exit(self):
         time.sleep(5)

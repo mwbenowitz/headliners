@@ -25,7 +25,7 @@ def main():
     db = dbManager()
 
     for site in mainConfig['sites']:
-
+        print "===" + site['name'] + '==='
         # Store/get site_id and snap_id from neo4j
         currentTime = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
         site_id, snapshot_id = db.storeSource(site, currentTime)
@@ -61,7 +61,7 @@ def main():
         fullScreen = None
 
         # Get the articles from the page
-        articles = selenium.getArticles(site['articleElements'], site['findArticlesBy'])
+        articles = selenium.getArticles(site['articleElements'], site['findArticlesBy'], site['skipClasses'])
 
         multiplyBy = {}
         modifiers = site['modifiers']
@@ -75,8 +75,6 @@ def main():
             headline, headEl = selenium.getHeader(article, site['headlineClasses'])
             if not headline:
                 print "======FAILED HEADLINE======"
-                print headline, headEl
-                print article.get_attribute('innerHTML')
                 continue
 
             headline = re.sub(r'<.*>', '', headline)
@@ -85,8 +83,6 @@ def main():
             headLink = selenium.getLink(article, headline, site['linkClasses'])
             if not headLink:
                 print "======FAILED LINK======"
-                print headLink
-                print article.get_attribute('innerHTML')
                 continue
 
             size = article.size
