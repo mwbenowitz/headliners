@@ -95,12 +95,12 @@
             "shortName": "chron",
             "homeURL": "https://www.houstonchronicle.com",
             "findArticlesBy": "class",
-            "articleElements": ["item", "prem-hl-item", "prem-block", "sec-hl-item", "ftc-item-wrap", "column", "hc-totn-item"],
+            "articleElements": ["item", "prem-hl-item", "prem-block", "sec-hl-item", "ftc-item-wrap", "column", "hc-totn-item", "hc_breaking"],
             "headlineClasses": ["headline"],
             "skipClasses": [],
             "linkClasses": [],
             "modifiers": [],
-            "popUpCloseID": "closeCross"
+            "popUpCloseID": "bcLightboxCloseButtonMain"
         },{
             "name": "The Wall Street Journal",
             "shortName": "wsj",

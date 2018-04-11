@@ -74,9 +74,7 @@ class seleniumManager:
             if len(skipClasses) > 0:
                 for art in fArticles:
                     artClasses = art.get_attribute('class')
-                    print artClasses
                     for skipClass in skipClasses:
-                        print skipClass
                         if skipClass in artClasses:
                             fArticles.remove(art)
             articles = articles + fArticles
