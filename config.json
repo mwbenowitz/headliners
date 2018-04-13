@@ -2,6 +2,102 @@
     "group": "Real News",
     "sites":[
         {
+            "name": "The New York Times",
+            "shortName": "nyt",
+            "homeURL": "https://www.nytimes.com",
+            "findArticlesBy": "xpath",
+            "articleElements": ["article"],
+            "headlineClasses": ["story-heading", "refer-heading"],
+            "skipClasses": [],
+            "linkClasses": ["story-link"],
+            "modifiers": [],
+            "popUpCloseID": "closeCross",
+            "popUpCloseClasses": []
+        },{
+            "name": "National Public Radio",
+            "shortName": "npr",
+            "homeURL": "https://www.npr.org",
+            "findArticlesBy": "xpath",
+            "articleElements": ["article"],
+            "headlineClasses": ["title"],
+            "skipClasses": ["resaudio"],
+            "linkClasses": [],
+            "modifiers": [],
+            "popUpCloseID": "closeCross",
+            "popUpCloseClasses": []
+        },{
+            "name": "CNN",
+            "shortName": "cnn",
+            "homeURL": "https://www.cnn.com",
+            "findArticlesBy": "xpath",
+            "articleElements": ["article"],
+            "headlineClasses": ["cd__headline"],
+            "skipClasses": ["cd--tool"],
+            "linkClasses": [],
+            "modifiers": [],
+            "popUpCloseID": "closeCross",
+            "popUpCloseClasses": []
+        },{
+            "name": "Fox News",
+            "shortName": "fox",
+            "homeURL": "http://www.foxnews.com",
+            "findArticlesBy": "xpath",
+            "articleElements": ["article"],
+            "headlineClasses": ["title"],
+            "skipClasses": [],
+            "linkClasses": [],
+            "modifiers": [],
+            "popUpCloseID": "closeCross",
+            "popUpCloseClasses": []
+        },{
+            "name": "The Washington Post",
+            "shortName": "wapo",
+            "homeURL": "https://www.washingtonpost.com",
+            "findArticlesBy": "class",
+            "articleElements": ["pb-f-homepage-story", "powa-playlist-item"],
+            "headlineClasses": ["headline"],
+            "skipClasses": [],
+            "linkClasses": [],
+            "modifiers": [],
+            "popUpCloseID": "closeCross",
+            "popUpCloseClasses": []
+        },{
+            "name": "The Chicago Tribune",
+            "shortName": "trib",
+            "homeURL": "http://www.chicagotribune.com",
+            "findArticlesBy": "class",
+            "articleElements": ["trb_outfit_primaryItem_article", "trb_outfit_group_list_item", "trb_outfit_list_headline", "trb_brk_g_i"],
+            "headlineClasses": ["trb_outfit_primaryItem_article_title", "trb_outfit_relatedListTitle", "trb_outfit_list_headline_a", "trb_brk_g_i_t"],
+            "skipClasses": [],
+            "linkClasses": [],
+            "modifiers": [],
+            "popUpCloseID": "closeCross",
+            "popUpCloseClasses": []
+        },{
+            "name": "The LA Times",
+            "shortName": "lat",
+            "homeURL": "http://www.latimes.com",
+            "findArticlesBy": "class",
+            "articleElements": ["pb-f-homepage-story", "pb-f-global-generic-card", "pb-f-list-recommender", "collection-item", "collection-item-border-bottom"],
+            "headlineClasses": ["heavy-text", "card-title"],
+            "skipClasses": [],
+            "linkClasses": [],
+            "modifiers": [],
+            "popUpCloseID": "closeCross",
+            "popUpCloseClasses": []
+        },{
+            "name": "USA Today",
+            "shortName": "usat",
+            "homeURL": "https://www.usatoday.com",
+            "findArticlesBy": "class",
+            "articleElements": ["hfwmm-primary-wrap", "hgpfm-link", "js-asset-link", "hgsm-link"],
+            "headlineClasses": ["js-asset-headline", "hgsm-image-hed"],
+            "skipClasses": [],
+            "linkClasses": [],
+            "modifiers": [],
+            "popUpCloseID": "closeCross",
+            "popUpCloseClasses": []
+        },{
             "name": "Houston Chronicle",
             "shortName": "chron",
             "homeURL": "https://www.houstonchronicle.com",
@@ -13,6 +109,18 @@
             "modifiers": [],
             "popUpCloseID": "bcLightboxCloseButtonMain",
             "popUpCloseClasses": ["fancybox-close"]
+        },{
+            "name": "The Wall Street Journal",
+            "shortName": "wsj",
+            "homeURL": "https://www.wsj.com",
+            "findArticlesBy": "class",
+            "articleElements": ["wsj-card"],
+            "headlineClasses": ["wsj-headline-link"],
+            "skipClasses": [],
+            "linkClasses": [],
+            "modifiers": [],
+            "popUpCloseID": "closeCross",
+            "popUpCloseClasses": []
         }
     ]
 }
