@@ -54,11 +54,15 @@ class seleniumManager:
             lastHeight = newHeight
 
     # Close any popover (if one exists)
-    def closePopover(self, popup_id):
+    def closePopover(self, popup_id, popup_classes):
         try:
             popover = self.driver.find_element_by_id(popup_id)
             if popover:
                 popover.click();
+            for popup_class in popup_classes:
+                popover = self.driver.find_elements_by_class_name(popup_class)
+                if popover:
+                    popover.click()
         except common.exceptions.ElementNotVisibleException:
             pass
         except common.exceptions.NoSuchElementException:
@@ -100,11 +104,12 @@ class seleniumManager:
                 for checkHead in possibleHeads:
                     headline = checkHead.text
                     if not validateString(headline):
-                        continue
+                        headline = checkHead.get_attribute('innerHTML')
+                        if not validateString(headline):
+                            continue
                     return headline, checkHead
             except common.exceptions.NoSuchElementException:
                 continue
-
         return False, False
 
     def getLink(self, article, headline, linkClasses):

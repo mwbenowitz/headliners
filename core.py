@@ -53,7 +53,7 @@ def main():
         if timeout:
             continue
 
-        selenium.closePopover(site['popUpCloseID'])
+        selenium.closePopover(site['popUpCloseID'], site['popUpCloseClasses'])
 
         body = selenium.driver.find_element_by_xpath("//body")
         bodySize = body.size
@@ -84,6 +84,7 @@ def main():
             if not headLink:
                 print "======FAILED LINK======"
                 continue
+            headLink = re.sub(r'[\/]*(?:#|\?).+$', '', headLink)
 
             size = article.size
             loc = article.location
