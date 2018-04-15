@@ -32,7 +32,6 @@ def articles():
     client = Elasticsearch([{'host': config['ES']['host'], 'port': int(config['ES']['port'])}])
 
     es = Search(using=client, index=config['ES']['index'], doc_type='Headline').query(Q('query_string', query=headline))
-    es = es[0:1000]
     headlines = es.execute()
 
     if headlines['hits']['total'] == 0:
@@ -40,8 +39,8 @@ def articles():
         return nonResponse
     response = {"total": 0, 'articles': {}}
     uuids = []
-    for head in headlines['hits']['hits']:
-        headUUID = head['_id']
+    for head in es.scan():
+        headUUID = head.meta.id
         uuids.append(headUUID)
     articles, total = getArticles(uuids)
     response['total'] = total
