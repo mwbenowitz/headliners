@@ -76,8 +76,7 @@ def main():
             if not headline:
                 print "======FAILED HEADLINE======"
                 continue
-
-            headline = re.sub(r'<.*>', '', headline)
+            headline = re.sub(r'<.*?>', '', headline).strip()
             headSizeRaw = headEl.value_of_css_property("font-size")
 
             headLink = selenium.getLink(article, headline, site['linkClasses'])
@@ -85,7 +84,7 @@ def main():
                 print "======FAILED LINK======"
                 continue
             headLink = re.sub(r'[\/]*(?:#|\?).+$', '', headLink)
-
+            print headline, headLink
             size = article.size
             loc = article.location
 

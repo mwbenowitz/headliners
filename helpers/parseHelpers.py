@@ -4,7 +4,7 @@
 #
 
 def validateString(str):
-    if not str or str == ' ' or str == '':
+    if not str or str.isspace() or str == '':
         return False
     elif len(str) < 13:
         return False
