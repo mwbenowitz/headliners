@@ -80,7 +80,7 @@ def getArticles(UUIDs):
         sortTime = datetime.strptime(match['time'], "%Y-%m-%dT%H:%M:%S")
         snap = {
             'time': sortTime,
-            'uuid': match['snap_uuid'],
+            'uuid': match['headline_uuid'],
             'score': round(match['score'], 3),
             'pos': {'x': match['pos_x'], 'y': match['pos_y']},
             'size': {'height': match['height'], 'width': match['width']}
