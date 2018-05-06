@@ -13,8 +13,9 @@ from elasticsearch_dsl import Search, Q
 from datetime import datetime
 
 config = configparser.ConfigParser()
+config.read(os.path.dirname(os.path.abspath(__file__)) + '/../headliner.conf')
 app = Flask(__name__)
-cache_config = {'CACHE_TYPE': 'filesystem', 'CACHE_DIR': 'tmp'}
+cache_config = {'CACHE_TYPE': config['Cache']['type'], 'CACHE_DIR': config['Cache']['dir']}
 cache = Cache(app, config=cache_config)
 cors = CORS(app)
 config.read(os.path.join(app.root_path, '../headliner.conf'))

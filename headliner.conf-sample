@@ -8,3 +8,7 @@ db_psw = PSW
 host = localhost
 port = 9200
 index = NEO4J_INDEX
+
+[Cache]
+type = TYPE (only simple and filesystem supported now)
+dir = TMP_DIR (if using filesystem)
