@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, escape
 from neo4j.v1 import GraphDatabase, basic_auth
 from flask_cors import CORS
+from flask_caching import Cache
 import sqlite3
 import configparser
 import json
@@ -11,13 +12,15 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, Q
 from datetime import datetime
 
-
 config = configparser.ConfigParser()
 app = Flask(__name__)
+cache_config = {'CACHE_TYPE': 'filesystem', 'CACHE_DIR': 'tmp'}
+cache = Cache(app, config=cache_config)
 cors = CORS(app)
 config.read(os.path.join(app.root_path, '../headliner.conf'))
 
 @app.route("/")
+@cache.cached(timeout=43200)
 def main():
     jsonResponse = jsonify({
         "name": "Headlinr",
@@ -25,7 +28,15 @@ def main():
     })
     return jsonResponse
 
+def make_cache_key(*args, **kwargs):
+    path = request.path
+    args = request.args
+    args_str = str(args.to_dict())
+    cache_key = str(hashlib.md5(path+args_str).hexdigest())
+    return cache_key
+
 @app.route("/articles")
+@cache.cached(timeout=600, key_prefix=make_cache_key)
 def articles():
     headline = request.args.get('headline')
 
