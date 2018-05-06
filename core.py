@@ -84,7 +84,6 @@ def main():
                 print "======FAILED LINK======"
                 continue
             headLink = re.sub(r'[\/]*(?:#|\?).+$', '', headLink)
-            print headline, headLink
             size = article.size
             loc = article.location
 
