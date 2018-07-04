@@ -1,4 +1,5 @@
 from selenium import webdriver, common
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -9,11 +10,14 @@ from helpers.parseHelpers import validateString
 class seleniumManager:
 
     def __init__(self):
-        self.chromeOptions = webdriver.ChromeOptions()
-        self.chromeOptions.add_argument("--headless")
-        self.chromeOptions.add_argument("window-size=1920,1080")
-        self.chromeOptions.add_argument("--no-sandbox")
-        self.driver = webdriver.Chrome('/usr/local/bin/chromedriver', chrome_options=self.chromeOptions)
+        self.options = Options()
+        self.options.set_headless(headless=True)
+        self.driver = webdriver.Firefox(firefox_options=self.options)
+        #self.chromeOptions = webdriver.ChromeOptions()
+        #self.chromeOptions.add_argument("--headless")
+        #self.chromeOptions.add_argument("window-size=1920,1080")
+        #self.chromeOptions.add_argument("--no-sandbox")
+        #self.driver = webdriver.Chrome('/usr/local/bin/chromedriver', chrome_options=self.chromeOptions)
 
     def loadPage(self, url):
         try:
@@ -26,7 +30,8 @@ class seleniumManager:
 
     def resetConnection(self):
         self.driver.quit()
-        self.driver = webdriver.Chrome('/usr/local/bin/chromedriver', chrome_options=self.chromeOptions)
+        #self.driver = webdriver.Chrome('/usr/local/bin/chromedriver', chrome_options=self.chromeOptions)
+        self.driver = webdriver.Firefox(firefox_options=self.options)
 
     def timeoutChecker(self):
         try:
@@ -97,6 +102,8 @@ class seleniumManager:
                     return headline, checkHead
             except common.exceptions.NoSuchElementException:
                 continue
+            except common.exceptions.StaleElementReferenceException:
+                continue
 
         for hTag in ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'a']:
             try:
@@ -109,6 +116,8 @@ class seleniumManager:
                             continue
                     return headline, checkHead
             except common.exceptions.NoSuchElementException:
+                continue
+            except common.exceptions.StaleElementReferenceException:
                 continue
         return False, False
 
@@ -141,6 +150,5 @@ class seleniumManager:
         return False
 
     def exit(self):
-        time.sleep(5)
-        self.driver.close()
         self.driver.quit()
+        #self.driver.close()
