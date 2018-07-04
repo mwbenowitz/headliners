@@ -10,14 +10,19 @@ from helpers.parseHelpers import validateString
 class seleniumManager:
 
     def __init__(self):
-        self.options = Options()
-        self.options.set_headless(headless=True)
-        self.driver = webdriver.Firefox(firefox_options=self.options)
-        #self.chromeOptions = webdriver.ChromeOptions()
-        #self.chromeOptions.add_argument("--headless")
-        #self.chromeOptions.add_argument("window-size=1920,1080")
-        #self.chromeOptions.add_argument("--no-sandbox")
-        #self.driver = webdriver.Chrome('/usr/local/bin/chromedriver', chrome_options=self.chromeOptions)
+        #self.options = Options()
+        #self.options.set_headless(headless=True)
+        #self.driver = webdriver.Firefox(firefox_options=self.options)
+        self.chromeOptions = webdriver.ChromeOptions()
+        self.chromeOptions.add_argument("--headless")
+        self.chromeOptions.add_argument("window-size=1920,1080")
+        self.chromeOptions.add_argument("--no-sandbox")
+	self.chromeOptions.add_argument("--proxy-server='direct://'")
+	self.chromeOptions.add_argument("--proxy-bypass-list=*")
+	self.chromeOptions.add_argument("--disable-gpu")
+	prefs = {'profile.managed_default_content_settings.images': 2}
+	self.chromeOptions.add_experimental_option("prefs", prefs)
+        self.driver = webdriver.Chrome('/usr/local/bin/chromedriver', chrome_options=self.chromeOptions)
 
     def loadPage(self, url):
         try:
@@ -72,6 +77,8 @@ class seleniumManager:
             pass
         except common.exceptions.NoSuchElementException:
             pass
+	except common.exceptions.ElementNotInteractableException:
+	    pass
 
     def getArticles(self, articleElements, find_type, skipClasses):
         articles = []

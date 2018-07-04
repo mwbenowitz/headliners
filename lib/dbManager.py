@@ -39,7 +39,7 @@ class dbManager:
 
     def storeArticle(self, headline, headLink, score, size, loc, site_id, snapshot_id):
         try:
-            article_exist = self.db.run("MATCH (s:Source)--(ss:SnapShot)--(h:Headline)--(a:Article) WHERE ID(s) = {site_id} AND a.link = {link} RETURN ID(a) as article_id", {"site_id": site_id, "link": headLink}).peek()
+            article_exist = self.db.run("MATCH (a:Article) WHERE a.link = {link} RETURN ID(a) as article_id", {"link": headLink}).peek()
             if article_exist:
                 article_id = article_exist["article_id"]
                 headline = {"headline": headline, "score": score, "width": size['width'], "height": size['height'], "loc_x": loc['x'], "loc_y": loc['y']}
@@ -67,7 +67,6 @@ class dbManager:
                 article_insert = self.db.run(article_str, article_headline).peek()
                 article_id = article_insert['article_id']
                 headline_id = article_insert['headline_id']
-
             return article_id, headline_id
         except Exception as e:
             print "Error raised in dbManager.storeArticle"
