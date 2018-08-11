@@ -65,7 +65,7 @@ def getArticles(UUIDs):
     db = driver.session()
     art_ret = {}
     art_total = 0
-    article_q = "MATCH (s:Source)--(ss:SnapShot)--(h:Headline)--(a:Article) WHERE h.uuid IN {UUIDs} RETURN a.link as link, a.uuid as art_uuid, ss.run_time as time, ss.uuid as snap_uuid, s.code as code, s.name as name, h.height as height, h.width as width, h.loc_x as pos_x, h.loc_y as pos_y, h.score as score, h.headline as headline, h.uuid as headline_uuid ORDER BY ss.run_time"
+    article_q = "MATCH (s:Source)<-[:SITE]-(ss:SnapShot)-[:HAS]->(h:Headline)-[:HEADLINE]->(a:Article) WHERE h.uuid IN {UUIDs} RETURN a.link as link, a.uuid as art_uuid, ss.run_time as time, ss.uuid as snap_uuid, s.code as code, s.name as name, h.height as height, h.width as width, h.loc_x as pos_x, h.loc_y as pos_y, h.score as score, h.headline as headline, h.uuid as headline_uuid ORDER BY ss.run_time"
     matches = db.run(article_q, {"UUIDs": UUIDs})
     for match in matches:
         md5 = hashlib.md5()
