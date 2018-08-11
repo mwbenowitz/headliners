@@ -60,6 +60,51 @@ def articles():
     response['articles'] = parsedArticles
     return jsonify(response)
 
+@app.route("/test_articles")
+@cache.cached(timeout=600, key_prefix=make_cache_key)
+def articles():
+    headline = request.args.get('headline')
+
+    client = Elasticsearch([{'host': config['ES']['host'], 'port': int(config['ES']['port'])}])
+
+    es = Search(using=client, index=config['ES']['index'], doc_type='Headline').query(Q('query_string', query=headline))
+    headlines = es.execute()
+
+    if headlines['hits']['total'] == 0:
+        nonResponse = jsonify({'message': 'No results found for your search'})
+        return nonResponse
+    response = {"total": 0, 'articles': {}}
+    uuids = []
+    for head in es.scan():
+        headUUID = head.meta.id
+        uuids.append(headUUID)
+    startDate, endDate, total, source_totals = getArticleRange(uuids)
+    return jsonify({'start': startDate, 'end': endDate, 'total': total, 'sources': source_totals})
+    #articles, total = getArticles(uuids)
+    response['total'] = total
+    parsedArticles = parseArticlesForDisplay(articles)
+    response['articles'] = parsedArticles
+    return jsonify(response)
+
+def getArticleRange(UUIDs):
+    driver = GraphDatabase.driver(config['DB']['db_url'], auth=basic_auth(config['DB']['db_usr'], config['DB']['db_psw']))
+    db = driver.session()
+
+    start_res = db.run("MATCH (ss:SnapShot)-[:HAS]->(h:Headline) WHERE h.uuid IN {uuids} RETURN ss.run_time as time ORDER BY ss.run_time ASC LIMIT 1", {"uuids": UUIDs}).peek()
+    startDate = start_res['time']
+
+    end_res = db.run("MATCH (ss:SnapShot)-[:HAS]->(h:Headline) WHERE h.uuid IN {uuids} RETURN ss.run_time as time ORDER BY ss.run_time DESC LIMIT 1", {"uuids": UUIDs}).peek()
+    endDate = end_res['time']
+
+    total_res = db.run("MATCH (s:Source)<-[:SITE]-(ss:SnapShot)-[:HAS]->(h:Headline)-[:HEADLINE]->(a:Article) WHERE h.uuid IN {uuids} RETURN s.name as name, COUNT(a) as article_count", {"uuids": UUIDs})
+    total = 0
+    totals = []
+    for source_total in total_res:
+        total += source_total['article_count']
+        totals.append({"source": source_total['name'], "count": source_total["article_count"]})
+
+    return startDate, endDate, total, source_totals
+
 def getArticles(UUIDs):
     driver = GraphDatabase.driver(config['DB']['db_url'], auth=basic_auth(config['DB']['db_usr'], config['DB']['db_psw']))
     db = driver.session()
