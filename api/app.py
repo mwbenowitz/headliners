@@ -54,7 +54,8 @@ def articles():
     for head in es.scan():
         headUUID = head.meta.id
         uuids.append(headUUID)
-    articles, total = getArticles(uuids)
+    length = count(uuids)
+    articles, total = getArticles(uuids, 0, length)
     response['total'] = total
     parsedArticles = parseArticlesForDisplay(articles)
     response['articles'] = parsedArticles
@@ -62,12 +63,13 @@ def articles():
 
 @app.route("/test_articles")
 @cache.cached(timeout=600, key_prefix=make_cache_key)
-def articles():
+def test_articles():
     headline = request.args.get('headline')
-
+    start = 0
+    end = 25
     client = Elasticsearch([{'host': config['ES']['host'], 'port': int(config['ES']['port'])}])
 
-    es = Search(using=client, index=config['ES']['index'], doc_type='Headline').query(Q('query_string', query=headline))
+    es = Search(using=client, index=config['ES']['index'], doc_type='Headline').query(Q('query_string', query=headline)).sort("_score")
     headlines = es.execute()
 
     if headlines['hits']['total'] == 0:
@@ -79,11 +81,11 @@ def articles():
         headUUID = head.meta.id
         uuids.append(headUUID)
     startDate, endDate, total, source_totals = getArticleRange(uuids)
-    return jsonify({'start': startDate, 'end': endDate, 'total': total, 'sources': source_totals})
-    #articles, total = getArticles(uuids)
-    response['total'] = total
+    articles = getArticles(parse_uuids, start, end)
     parsedArticles = parseArticlesForDisplay(articles)
     response['articles'] = parsedArticles
+    response['start'] = startDate
+    response['end'] = endDate
     return jsonify(response)
 
 def getArticleRange(UUIDs):
@@ -96,21 +98,22 @@ def getArticleRange(UUIDs):
     end_res = db.run("MATCH (ss:SnapShot)-[:HAS]->(h:Headline) WHERE h.uuid IN {uuids} RETURN ss.run_time as time ORDER BY ss.run_time DESC LIMIT 1", {"uuids": UUIDs}).peek()
     endDate = end_res['time']
 
-    total_res = db.run("MATCH (s:Source)<-[:SITE]-(ss:SnapShot)-[:HAS]->(h:Headline)-[:HEADLINE]->(a:Article) WHERE h.uuid IN {uuids} RETURN s.name as name, COUNT(a) as article_count", {"uuids": UUIDs})
+    total_res = db.run("MATCH (s:Source)<-[:SITE]-(ss:SnapShot)-[:HAS]->(h:Headline)-[:HEADLINE]->(a:Article) WHERE h.uuid IN {uuids} RETURN s.name as name, COUNT(DISTINCT a) as article_count", {"uuids": UUIDs})
     total = 0
     totals = []
     for source_total in total_res:
         total += source_total['article_count']
         totals.append({"source": source_total['name'], "count": source_total["article_count"]})
 
-    return startDate, endDate, total, source_totals
+    return startDate, endDate, total, totals
 
-def getArticles(UUIDs):
+def getArticles(UUIDs, start=0, end=25):
     driver = GraphDatabase.driver(config['DB']['db_url'], auth=basic_auth(config['DB']['db_usr'], config['DB']['db_psw']))
     db = driver.session()
     art_ret = {}
-    art_total = 0
-    article_q = "MATCH (s:Source)<-[:SITE]-(ss:SnapShot)-[:HAS]->(h:Headline)-[:HEADLINE]->(a:Article) WHERE h.uuid IN {UUIDs} RETURN a.link as link, a.uuid as art_uuid, ss.run_time as time, ss.uuid as snap_uuid, s.code as code, s.name as name, h.height as height, h.width as width, h.loc_x as pos_x, h.loc_y as pos_y, h.score as score, h.headline as headline, h.uuid as headline_uuid ORDER BY ss.run_time"
+
+    article_q = "MATCH (h:Headline)-[:HEADLINE*1..1]->(a:Article) WHERE h.uuid IN {UUIDs} WITH DISTINCT a SKIP {start} LIMIT {end} MATCH (a)<-[:HEADLINE*1..1]-(h:Headline)<-[:HAS*1..1]-(ss:SnapShot)-[:SITE*1..1]->(s:Source) RETURN a.link as link, a.uuid as art_uuid, ss.run_time as time, ss.uuid as snap_uuid, s.code as code, s.name as name, h.height as height, h.width as width, h.loc_x as pos_x, h.loc_y as pos_y, h.score as score, h.headline as headline, h.uuid as headline_uuid ORDER BY ss.run_time"
+    #article_q = "MATCH (s:Source)<-[:SITE*1..1]-(ss:SnapShot)-[:HAS*1..1]->(h:Headline)-[:HEADLINE*1..1]->(a:Article) WHERE h.uuid IN {UUIDs} RETURN a.link as link, a.uuid as art_uuid, ss.run_time as time, ss.uuid as snap_uuid, s.code as code, s.name as name, h.height as height, h.width as width, h.loc_x as pos_x, h.loc_y as pos_y, h.score as score, h.headline as headline, h.uuid as headline_uuid ORDER BY ss.run_time"
     matches = db.run(article_q, {"UUIDs": UUIDs})
     for match in matches:
         md5 = hashlib.md5()
@@ -122,7 +125,6 @@ def getArticles(UUIDs):
                 'articles': {}
             }
         if match['art_uuid'] not in art_ret[match['code']]['articles']:
-            art_total += 1
             art_ret[match['code']]['articles'][match['art_uuid']] = {
                 "link": match['link'],
                 "uuid": match['art_uuid'],
@@ -144,7 +146,7 @@ def getArticles(UUIDs):
         }
         art_ret[match['code']]['articles'][match['art_uuid']]['snapshots'][head_id]['versions'].append(snap)
 
-    return art_ret, art_total
+    return art_ret
 
 def parseArticlesForDisplay(art_ret):
     parsed_articles = {}
