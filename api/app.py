@@ -54,8 +54,7 @@ def articles():
     for head in es.scan():
         headUUID = head.meta.id
         uuids.append(headUUID)
-    length = count(uuids)
-    articles, total = getArticles(uuids, 0, length)
+    articles, total = getArticles(uuids)
     response['total'] = total
     parsedArticles = parseArticlesForDisplay(articles)
     response['articles'] = parsedArticles
@@ -107,14 +106,20 @@ def getArticleRange(UUIDs):
 
     return startDate, endDate, total, totals
 
-def getArticles(UUIDs, start=0, end=25):
+def getArticles(UUIDs, start=None, end=None):
     driver = GraphDatabase.driver(config['DB']['db_url'], auth=basic_auth(config['DB']['db_usr'], config['DB']['db_psw']))
     db = driver.session()
     art_ret = {}
 
-    article_q = "MATCH (h:Headline)-[:HEADLINE*1..1]->(a:Article) WHERE h.uuid IN {UUIDs} WITH DISTINCT a SKIP {start} LIMIT {end} MATCH (a)<-[:HEADLINE*1..1]-(h:Headline)<-[:HAS*1..1]-(ss:SnapShot)-[:SITE*1..1]->(s:Source) RETURN a.link as link, a.uuid as art_uuid, ss.run_time as time, ss.uuid as snap_uuid, s.code as code, s.name as name, h.height as height, h.width as width, h.loc_x as pos_x, h.loc_y as pos_y, h.score as score, h.headline as headline, h.uuid as headline_uuid ORDER BY ss.run_time"
+    paging_params = ''
+    if start:
+        paging_params += ' SKIP {start}'
+    if end:
+        paging_params += ' LIMIT {end}'
+
+    article_q = "MATCH (h:Headline)-[:HEADLINE*1..1]->(a:Article) WHERE h.uuid IN {UUIDs} WITH DISTINCT a" + start_end + " MATCH (a)<-[:HEADLINE*1..1]-(h:Headline)<-[:HAS*1..1]-(ss:SnapShot)-[:SITE*1..1]->(s:Source) RETURN a.link as link, a.uuid as art_uuid, ss.run_time as time, ss.uuid as snap_uuid, s.code as code, s.name as name, h.height as height, h.width as width, h.loc_x as pos_x, h.loc_y as pos_y, h.score as score, h.headline as headline, h.uuid as headline_uuid ORDER BY ss.run_time"
     #article_q = "MATCH (s:Source)<-[:SITE*1..1]-(ss:SnapShot)-[:HAS*1..1]->(h:Headline)-[:HEADLINE*1..1]->(a:Article) WHERE h.uuid IN {UUIDs} RETURN a.link as link, a.uuid as art_uuid, ss.run_time as time, ss.uuid as snap_uuid, s.code as code, s.name as name, h.height as height, h.width as width, h.loc_x as pos_x, h.loc_y as pos_y, h.score as score, h.headline as headline, h.uuid as headline_uuid ORDER BY ss.run_time"
-    matches = db.run(article_q, {"UUIDs": UUIDs})
+    matches = db.run(article_q, {"UUIDs": UUIDs, "start": start, "end": start + end})
     for match in matches:
         md5 = hashlib.md5()
         md5.update(match['headline'].encode('utf-8'))
